@@ -47,17 +47,28 @@ contract VoteFactory is  Ownable   {
     mapping(uint256 => address) public voteOwner;
     uint256 voteId;
 
+    uint256 private createVoteFee = 0.0001 ether;
+
     constructor() public {
         owner = msg.sender;
     }
 
-    function createVote(string _question) public {
+    function withdraw() public onlyOwner() {
+        owner.transfer(address(this).balance);
+    }
+
+    function setCreateVoteFee(uint256 _fee) public onlyOwner() {
+        createVoteFee = _fee; 
+    }
+
+    function createVote(string _question) public payable {
+        require(msg.value >= createVoteFee);
         voteId = votes.push(Vote(_question, State.Initial, new string[](0))) - 1;
         voteOwner[voteId] = msg.sender;
         emit CreateVote(voteId, _question);
     }
 
-    function addAnswer(uint256 _voteId, string _answer) public  ownerOfVote(_voteId) voteStateEqually(_voteId, State.Initial)  validVote(_voteId) {
+    function addAnswer(uint256 _voteId, string _answer) public ownerOfVote(_voteId) voteStateEqually(_voteId, State.Initial) validVote(_voteId) {
         votes[_voteId].answers.push(_answer);
     }
 
@@ -67,7 +78,12 @@ contract VoteFactory is  Ownable   {
         emit StartVote(_voteId);
     }
 
-   function voteAnswer(uint256 _voteId, uint256 _answerOption) public voterNotVoted(_voteId) voteStateEqually(_voteId, State.Started) validVote(_voteId)  {
+   function voteAnswer(
+        uint256 _voteId,
+        uint256 _answerOption
+    )
+        public voterNotVoted(_voteId) voteStateEqually(_voteId, State.Started) validVote(_voteId) {
+        
         require(votes[_voteId].answers.length >= _answerOption);
         votes[_voteId].voterIsVoted[msg.sender] = true;
         votes[_voteId].voteCount[_answerOption] += 1; 

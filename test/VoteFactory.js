@@ -23,6 +23,8 @@ contract('VoteFactory', function(accounts) {
     const answer_optId_1 = 0;
     const answer_opt_2 = "Answer 1";
     const answer_optId_2 = 1;
+    const answer_opt_3 = "Answer 2";
+    const answer_optId_3 = 2;
     const vote_id_1 = 0;
     const vote_id_2 = 1;
 
@@ -72,6 +74,14 @@ contract('VoteFactory', function(accounts) {
             
             await expectThrow(voteFactory.startVote(vote_id_1, {from: creator}));
         });
+
+        it('do not start not existing vote ', async () => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
+
+            await expectThrow(voteFactory.startVote(vote_id_2, {from: creator}));
+        });
         
     });
     
@@ -89,6 +99,24 @@ contract('VoteFactory', function(accounts) {
             await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: creator}));
             await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: owner}));
             await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: user}));   
+        });
+
+        it('user should not be able to vote in a not exist ballot', async() => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id_1, {from: creator});
+
+            await expectThrow(voteFactory.voteAnswer(vote_id_2,  answer_optId_2, {from: creator}));
+        });
+
+        it('user should not be able to select a not exist answer option', async() => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id_1, {from: creator});
+
+           // await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_3, {from: creator}));
         });
     });
 
@@ -110,6 +138,18 @@ contract('VoteFactory', function(accounts) {
             voteResult = await voteFactory.voteCount(vote_id_1, {from: user});
             console.log(voteResult);
         });
+
+        it('user should not be able to get result of not exist ballot', async() => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: owner});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: user}); 
+            
+            await expectThrow(voteFactory.voteCount(vote_id_2, {from: owner}));
+        });
     }); 
 
     describe('stop vote', function() { 
@@ -124,6 +164,18 @@ contract('VoteFactory', function(accounts) {
             await voteFactory.EndVote(vote_id_1, {from: creator});
            // await expectThrow(voteFactory.EndVote(vote_id_1, {from: user}));
            // await expectThrow(voteFactory.EndVote(vote_id_1, {from: owner}));
+        });
+
+        it('user should not be able to end vote of not exist ballot', async() => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: owner});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: user}); 
+            
+            await voteFactory.EndVote(vote_id_2, {from: owner});
         });
     });
 
