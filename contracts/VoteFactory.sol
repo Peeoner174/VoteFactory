@@ -5,7 +5,7 @@ import "./Ownable.sol";
 contract VoteFactory is  Ownable   {
 
     modifier voterNotVoted(uint _voteId) {
-        require(votes[_voteId].voterIsVoted[owner] == false);
+        require(votes[_voteId].voterIsVoted[msg.sender] == false);
         _;
     }
 
@@ -14,7 +14,7 @@ contract VoteFactory is  Ownable   {
         _;
     }
 
-    modifier stateEqually(uint _voteId, State _state) {
+    modifier voteStateEqually(uint _voteId, State _state) {
         require(votes[_voteId].state == _state);
         _;
     }
@@ -51,18 +51,18 @@ contract VoteFactory is  Ownable   {
         emit CreateVote(voteId, _question);
     }
 
-    function addAnswer(uint256 _voteId, string _answer) public  ownerOfVote(_voteId) stateEqually(_voteId, State.Initial) {
+    function addAnswer(uint256 _voteId, string _answer) public  ownerOfVote(_voteId) voteStateEqually(_voteId, State.Initial) {
         votes[_voteId].answers.push(_answer);
     }
 
-    function startVote(uint _voteId) public ownerOfVote(_voteId) stateEqually(_voteId, State.Initial) {
+    function startVote(uint _voteId) public ownerOfVote(_voteId) voteStateEqually(_voteId, State.Initial) {
         require( votes[_voteId].answers.length >= 2);
         votes[_voteId].state = State.Started;
         emit StartVote(_voteId);
     }
 
-   function voteAnswer(uint _voteId, uint _answerOption) public voterNotVoted(_voteId) stateEqually(_voteId, State.Started)  {
-        votes[_voteId].voterIsVoted[owner] = true;
+   function voteAnswer(uint _voteId, uint _answerOption) public voterNotVoted(_voteId) voteStateEqually(_voteId, State.Started)  {
+        votes[_voteId].voterIsVoted[msg.sender] = true;
         votes[_voteId].voteCount[_answerOption] += 1; 
     }
     
@@ -78,8 +78,8 @@ contract VoteFactory is  Ownable   {
     return result;
     }
 
-    function isStopped(uint _voteId) public view returns(bool) {
-        return votes[_voteId].state == State.Stopped;
+    function isStarted(uint _voteId) public view returns(bool) {
+        return votes[_voteId].state == State.Started;
     }
  
 }

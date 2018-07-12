@@ -14,7 +14,7 @@ var VoteFactory = artifacts.require("./VoteFactory.sol");
 contract('VoteFactory', function(accounts) {
     var voteFactory;
 
-    const owner = accounts[0]; //voteFactory.owner(); //Создатель контракта
+    const owner = accounts[0]; //Создатель контракта
     const creator = accounts[1]; //Условный создатель единицы голосования
     const user = accounts[2];
 
@@ -52,9 +52,8 @@ contract('VoteFactory', function(accounts) {
 
             await expectThrow(voteFactory.startVote(vote_id, {from: owner}));
             await expectThrow(voteFactory.startVote(vote_id, {from: user}));
-            //await expect(await voteFactory.isStopped(ballot_Id)).to.equal(true);
             await voteFactory.startVote(vote_id, {from: creator});
-            //await expect(await voteFactory.isStopped(ballot_Id)).to.equal(false);  
+         //   await expect(await voteFactory.isStarted(vote_Id)).to.equal(true);  
             await expectThrow(voteFactory.startVote(vote_id, {from: creator}));
         });
 
@@ -75,25 +74,34 @@ contract('VoteFactory', function(accounts) {
             await voteFactory.startVote(vote_id, {from: creator});
             
             await voteFactory.voteAnswer(vote_id, answer_optId_1, {from: creator});
-            //await voteFactory.voteAnswer(ballot_id, answer1_id, {from: owner});
-            //await voteFactory.voteAnswer(ballot_id, answer0_id, {from: user}); 
+            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: owner});
+            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: user}); 
             
-            await expectThrow(voteFactory.voteAnswer(vote_id, answer_optId_2, {from: creator}));
-            //await expectThrow(voteFactory.voteAnswer(ballot_id, answer0_id, {from: owner}));
-            //await expectThrow(voteFactory.voteAnswer(ballot_id, answer0_id, {from: user}));   
+            await expectThrow(voteFactory.voteAnswer(vote_id,  answer_optId_2, {from: creator}));
+            await expectThrow(voteFactory.voteAnswer(vote_id,  answer_optId_2, {from: owner}));
+            await expectThrow(voteFactory.voteAnswer(vote_id,  answer_optId_2, {from: user}));   
         });
     });
 
-/*     describe('returns voters data', function() { 
+    describe('returns voters data', function() { 
         it('every user should be able to get result of a vote', async function() {
-            await voteFactory.createBallot(question0, ballotDuration, {from: creator});
-            await voteFactory.addAnswer(ballot_id, answer0, {from: creator});
-            await voteFactory.addAnswer(ballot_id, answer1, {from: creator});
-            await voteFactory.startVote(ballot_id, {from: creator});
-
-
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id, {from: creator});
+            await voteFactory.voteAnswer(vote_id, answer_optId_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: owner});
+            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: user}); 
+            
+            var voteResult; 
+            voteResult = await voteFactory.voteCount(vote_id, {from: creator});
+            console.log(voteResult);
+            voteResult = await voteFactory.voteCount(vote_id, {from: owner});
+            console.log(voteResult);
+            voteResult = await voteFactory.voteCount(vote_id, {from: user});
+            console.log(voteResult);
         });
-    }); */
+    }); 
 
  /*    describe('attacks', function() {
         it('short adress attack', async function () {
