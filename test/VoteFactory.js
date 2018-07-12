@@ -103,6 +103,21 @@ contract('VoteFactory', function(accounts) {
         });
     }); 
 
+    describe('stop vote', function() { 
+        it('only creator should be able to stop a vote', async () => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id, {from: creator});
+            await voteFactory.voteAnswer(vote_id, answer_optId_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: owner});
+
+            await voteFactory.EndVote(vote_id, {from: creator});
+           // await expectThrow(voteFactory.EndVote(vote_id, {from: user}));
+           // await expectThrow(voteFactory.EndVote(vote_id, {from: owner}));
+        });
+    });
+
  /*    describe('attacks', function() {
         it('short adress attack', async function () {
             var from = 0x01d9D1Ac7ebd965dBf0cbBdc5Ef5093DedA7f602;

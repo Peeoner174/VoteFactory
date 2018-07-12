@@ -66,7 +66,7 @@ contract VoteFactory is  Ownable   {
         votes[_voteId].voteCount[_answerOption] += 1; 
     }
     
-    function endVote(uint _voteId) public {
+    function endVote(uint _voteId) public ownerOfVote(_voteId) voteStateEqually(_voteId, State.Started){
        votes[_voteId].state = State.Stopped;
        emit EndVote(_voteId);
     }
