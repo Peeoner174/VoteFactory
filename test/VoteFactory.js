@@ -23,7 +23,8 @@ contract('VoteFactory', function(accounts) {
     const answer_optId_1 = 0;
     const answer_opt_2 = "Answer 1";
     const answer_optId_2 = 1;
-    const vote_id = 0;
+    const vote_id_1 = 0;
+    const vote_id_2 = 1;
 
     beforeEach('setup contract for each test', async function () {
         voteFactory = await VoteFactory.new({from: owner});
@@ -39,29 +40,37 @@ contract('VoteFactory', function(accounts) {
         it('answer should be able to added only creator this vote', async () => {
             await voteFactory.createVote(question_0, {from: creator});
 
-            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
-            await expectThrow(voteFactory.addAnswer(vote_id, answer_opt_2, {from: user}));
-            await expectThrow(voteFactory.addAnswer(vote_id, answer_opt_1, {from: owner})); 
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await expectThrow(voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: user}));
+            await expectThrow(voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: owner})); 
+        });
+
+        it('do not add answer in not existing vote', async() => {
+            await voteFactory.createVote(question_0, {from: creator});
+            
+            await expectThrow(voteFactory.addAnswer(vote_id_2, answer_opt_1, {from: creator}));
         });
 
         it('a creater should be able to started a vote', async () => {
 
             await voteFactory.createVote(question_0, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_2, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
 
-            await expectThrow(voteFactory.startVote(vote_id, {from: owner}));
-            await expectThrow(voteFactory.startVote(vote_id, {from: user}));
-            await voteFactory.startVote(vote_id, {from: creator});
-         //   await expect(await voteFactory.isStarted(vote_Id)).to.equal(true);  
-            await expectThrow(voteFactory.startVote(vote_id, {from: creator}));
+            await expectThrow(voteFactory.startVote(vote_id_1, {from: owner}));
+            await expectThrow(voteFactory.startVote(vote_id_1, {from: user}));
+            await voteFactory.startVote(vote_id_1, {from: creator});
+
+            //var state = await voteFactory.isStarted(vote_Id_1);
+            //state.should.be.equal(true);  
+            await expectThrow(voteFactory.startVote(vote_id_1, {from: creator}));
         });
 
         it('do not start vote if this vote have only one answer', async () => {
             await voteFactory.createVote(question_0, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             
-            await expectThrow(voteFactory.startVote(vote_id, {from: creator}));
+            await expectThrow(voteFactory.startVote(vote_id_1, {from: creator}));
         });
         
     });
@@ -69,36 +78,36 @@ contract('VoteFactory', function(accounts) {
     describe('voting', function() {
         it('every user should be able to vote only one time in a ballot', async () => {
             await voteFactory.createVote(question_0, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_2, {from: creator});
-            await voteFactory.startVote(vote_id, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id_1, {from: creator});
             
-            await voteFactory.voteAnswer(vote_id, answer_optId_1, {from: creator});
-            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: owner});
-            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: user}); 
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: owner});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: user}); 
             
-            await expectThrow(voteFactory.voteAnswer(vote_id,  answer_optId_2, {from: creator}));
-            await expectThrow(voteFactory.voteAnswer(vote_id,  answer_optId_2, {from: owner}));
-            await expectThrow(voteFactory.voteAnswer(vote_id,  answer_optId_2, {from: user}));   
+            await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: creator}));
+            await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: owner}));
+            await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: user}));   
         });
     });
 
     describe('returns voters data', function() { 
         it('every user should be able to get result of a vote', async function() {
             await voteFactory.createVote(question_0, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_2, {from: creator});
-            await voteFactory.startVote(vote_id, {from: creator});
-            await voteFactory.voteAnswer(vote_id, answer_optId_1, {from: creator});
-            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: owner});
-            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: user}); 
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: owner});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: user}); 
             
             var voteResult; 
-            voteResult = await voteFactory.voteCount(vote_id, {from: creator});
+            voteResult = await voteFactory.voteCount(vote_id_1, {from: creator});
             console.log(voteResult);
-            voteResult = await voteFactory.voteCount(vote_id, {from: owner});
+            voteResult = await voteFactory.voteCount(vote_id_1, {from: owner});
             console.log(voteResult);
-            voteResult = await voteFactory.voteCount(vote_id, {from: user});
+            voteResult = await voteFactory.voteCount(vote_id_1, {from: user});
             console.log(voteResult);
         });
     }); 
@@ -106,15 +115,15 @@ contract('VoteFactory', function(accounts) {
     describe('stop vote', function() { 
         it('only creator should be able to stop a vote', async () => {
             await voteFactory.createVote(question_0, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
-            await voteFactory.addAnswer(vote_id, answer_opt_2, {from: creator});
-            await voteFactory.startVote(vote_id, {from: creator});
-            await voteFactory.voteAnswer(vote_id, answer_optId_1, {from: creator});
-            await voteFactory.voteAnswer(vote_id, answer_optId_2, {from: owner});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_1, {from: creator});
+            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: owner});
 
-            await voteFactory.EndVote(vote_id, {from: creator});
-           // await expectThrow(voteFactory.EndVote(vote_id, {from: user}));
-           // await expectThrow(voteFactory.EndVote(vote_id, {from: owner}));
+            await voteFactory.EndVote(vote_id_1, {from: creator});
+           // await expectThrow(voteFactory.EndVote(vote_id_1, {from: user}));
+           // await expectThrow(voteFactory.EndVote(vote_id_1, {from: owner}));
         });
     });
 
