@@ -1,0 +1,135 @@
+const BigNumber = web3.BigNumber;
+var ethUtil = require('ethereumjs-util')
+var Tx = require('ethereumjs-tx');
+const expect = require('chai').expect;
+const should = require('chai')
+    .use(require('chai-as-promised'))
+    .use(require('chai-bignumber')(web3.BigNumber))
+    .should();
+
+import expectThrow from './helpers/expectThrow';
+
+var VoteFactory = artifacts.require("./VoteFactory.sol");
+
+contract('VoteFactory', function(accounts) {
+    var voteFactory;
+
+    const owner = accounts[0]; //voteFactory.owner(); //Создатель контракта
+    const creator = accounts[1]; //Условный создатель единицы голосования
+    const user = accounts[2];
+
+    const question_0 = "Question 0";
+    const answer_opt_1 = "Answer 0";
+    const answer_optId_1 = 0;
+    const answer_opt_2 = "Answer 1";
+    const answer_optId_2 = 1;
+    const vote_id = 0;
+
+    beforeEach('setup contract for each test', async function () {
+        voteFactory = await VoteFactory.new({from: owner});
+    });
+
+    describe('vote creation', function() {
+
+        it('every user should be able to create a vote', async () => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.createVote(question_0, {from: owner});
+        });
+
+        it('answer should be able to added only creator this vote', async () => {
+            await voteFactory.createVote(question_0, {from: creator});
+
+            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
+            await expectThrow(voteFactory.addAnswer(vote_id, answer_opt_2, {from: user}));
+            await expectThrow(voteFactory.addAnswer(vote_id, answer_opt_1, {from: owner})); 
+        });
+
+        it('a creater should be able to started a vote', async () => {
+
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_2, {from: creator});
+
+            await expectThrow(voteFactory.startVote(vote_id, {from: owner}));
+            await expectThrow(voteFactory.startVote(vote_id, {from: user}));
+            //await expect(await voteFactory.isStopped(ballot_Id)).to.equal(true);
+            await voteFactory.startVote(vote_id, {from: creator});
+            //await expect(await voteFactory.isStopped(ballot_Id)).to.equal(false);  
+            await expectThrow(voteFactory.startVote(vote_id, {from: creator}));
+        });
+
+        it('do not start vote if this vote have only one answer', async () => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
+            
+            await expectThrow(voteFactory.startVote(vote_id, {from: creator}));
+        });
+        
+    });
+    
+    describe('voting', function() {
+        it('every user should be able to vote only one time in a ballot', async () => {
+            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_1, {from: creator});
+            await voteFactory.addAnswer(vote_id, answer_opt_2, {from: creator});
+            await voteFactory.startVote(vote_id, {from: creator});
+            
+            await voteFactory.voteAnswer(vote_id, answer_optId_1, {from: creator});
+            //await voteFactory.voteAnswer(ballot_id, answer1_id, {from: owner});
+            //await voteFactory.voteAnswer(ballot_id, answer0_id, {from: user}); 
+            
+            await expectThrow(voteFactory.voteAnswer(vote_id, answer_optId_2, {from: creator}));
+            //await expectThrow(voteFactory.voteAnswer(ballot_id, answer0_id, {from: owner}));
+            //await expectThrow(voteFactory.voteAnswer(ballot_id, answer0_id, {from: user}));   
+        });
+    });
+
+/*     describe('returns voters data', function() { 
+        it('every user should be able to get result of a vote', async function() {
+            await voteFactory.createBallot(question0, ballotDuration, {from: creator});
+            await voteFactory.addAnswer(ballot_id, answer0, {from: creator});
+            await voteFactory.addAnswer(ballot_id, answer1, {from: creator});
+            await voteFactory.startVote(ballot_id, {from: creator});
+
+
+        });
+    }); */
+
+ /*    describe('attacks', function() {
+        it('short adress attack', async function () {
+            var from = 0x01d9D1Ac7ebd965dBf0cbBdc5Ef5093DedA7f602;
+            var from_bytes = "01d9D1Ac7ebd965dBf0cbBdc5Ef5093DedA7f602";
+            var to = 0x01d9D1Ac7ebd965dBf0cbBdc5Ef5093DedA7f602;
+            var to_bytes = "01d9D1Ac7ebd965dBf0cbBdc5Ef5093DedA7f602";
+            var value = 100;
+            var value_bytes = "8fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+            var feeSmt = 2;
+            var feeSmt_bytes = "7000000000000000000000000000000000000000000000000000000000000001";
+            var nonce = 0;
+            var nonce_bytes = "0000000000000000000000000000000000000000000000000000000000000000";
+            var msgBuffer = ethUtil.sha3("0x" + from_bytes + to_bytes + value_bytes + feeSmt_bytes + nonce_bytes)
+            var messagetoSign = ethUtil.bufferToHex(msgBuffer)
+            var messagetoSend = ethUtil.bufferToHex(ethUtil.hashPersonalMessage(msgBuffer)) 
+
+            const unlockedAccount = accounts[0]
+            var privkey = new Buffer('28780b50f222df8539903fc88f66cb02a602d9c1b8fc84e0e297cf51f7ca5911', 'hex');
+
+            var vrs = ethUtil.ecsign(msgBuffer, privkey);
+            let v = vrs.v.toString()
+            let r = ethUtil.bufferToHex(vrs.r)
+            let s = ethUtil.bufferToHex(vrs.s)
+
+            console.log(' msg2sign: ' + messagetoSign)        
+            console.log(' msg2send: ' + messagetoSend)    
+            console.log()
+            console.log(v)
+            console.log(r)
+            console.log(s)
+            console.log(ethUtil.publicToAddress(ethUtil.ecrecover(msgBuffer, v, r, s)).toString('hex'))    
+        
+            const recoveredAddress = await this.contract.transferProxy(from, to, value, feeSmt, v, r, s)
+            recoveredAddress.should.be.equal(unlockedAccount,'The recovered address should match the signing address')
+        });
+    }); */
+
+});
