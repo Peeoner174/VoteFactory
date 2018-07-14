@@ -63,8 +63,8 @@ contract('VoteFactory', function(accounts) {
             await expectThrow(voteFactory.startVote(vote_id_1, {from: user}));
             await voteFactory.startVote(vote_id_1, {from: creator});
 
-            //var state = await voteFactory.isStarted(vote_Id_1);
-            //state.should.be.equal(true);  
+            var state = await voteFactory.isStarted(vote_id_1);
+            state.should.be.equal(true);  
             await expectThrow(voteFactory.startVote(vote_id_1, {from: creator}));
         });
 
