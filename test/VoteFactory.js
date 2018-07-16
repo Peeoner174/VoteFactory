@@ -35,12 +35,12 @@ contract('VoteFactory', function(accounts) {
     describe('vote creation', function() {
 
         it('every user should be able to create a vote', async () => {
-            await voteFactory.createVote(question_0, {from: creator});
-            await voteFactory.createVote(question_0, {from: owner});
+            await voteFactory.createVote(question_0, {from: creator, value: web3.toWei(0.05, "ether")});
+            await voteFactory.createVote(question_0, {from: owner, value: web3.toWei(0.05, "ether")});
         });
 
         it('answer should be able to added only creator this vote', async () => {
-            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.createVote(question_0, {from: creator, value: web3.toWei(0.05, "ether")});
 
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             await expectThrow(voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: user}));
@@ -55,7 +55,7 @@ contract('VoteFactory', function(accounts) {
 
         it('a creater should be able to started a vote', async () => {
 
-            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.createVote(question_0, {from: creator, value: web3.toWei(0.05, "ether")});
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
 
@@ -69,7 +69,7 @@ contract('VoteFactory', function(accounts) {
         });
 
         it('do not start vote if this vote have only one answer', async () => {
-            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.createVote(question_0, {from: creator, value: web3.toWei(0.05, "ether")});
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             
             await expectThrow(voteFactory.startVote(vote_id_1, {from: creator}));
@@ -87,7 +87,7 @@ contract('VoteFactory', function(accounts) {
     
     describe('voting', function() {
         it('every user should be able to vote only one time in a ballot', async () => {
-            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.createVote(question_0, {from: creator, value: web3.toWei(0.05, "ether")});
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
             await voteFactory.startVote(vote_id_1, {from: creator});
@@ -102,7 +102,7 @@ contract('VoteFactory', function(accounts) {
         });
 
         it('user should not be able to vote in a not exist ballot', async() => {
-            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.createVote(question_0, {from: creator, value: web3.toWei(0.05, "ether")});
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
             await voteFactory.startVote(vote_id_1, {from: creator});
@@ -122,7 +122,7 @@ contract('VoteFactory', function(accounts) {
 
     describe('returns voters data', function() { 
         it('every user should be able to get result of a vote', async function() {
-            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.createVote(question_0, {from: creator, value: web3.toWei(0.05, "ether")});
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
             await voteFactory.startVote(vote_id_1, {from: creator});
@@ -154,7 +154,7 @@ contract('VoteFactory', function(accounts) {
 
     describe('stop vote', function() { 
         it('only creator should be able to stop a vote', async () => {
-            await voteFactory.createVote(question_0, {from: creator});
+            await voteFactory.createVote(question_0, {from: creator, value: web3.toWei(0.05, "ether")});
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
             await voteFactory.startVote(vote_id_1, {from: creator});
