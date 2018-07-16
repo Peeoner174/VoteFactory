@@ -19,9 +19,9 @@ contract VoteFactory is  Ownable   {
         _;
     }
 
-    event CreateVote(uint256 voteId, string question);
-    event StartVote(uint256 voteId);
-    event EndVote(uint256 voteId);
+    event CreateVote(uint256 indexed voteId, string question);
+    event StartVote(uint256 indexed voteId);
+    event EndVote(uint256 indexed voteId);
 
     enum State {
         Initial,
