@@ -103,11 +103,11 @@ contract VoteFactory is  Ownable   {
         return votes[_voteId].state == State.Started;
     }
 
-//    function casting(uint _voteId) returns(uint _answerOption) {
+//    function casting(uint _voteId) private view returns(uint _answerOption) {
 //            return votes[_voteId].votedFor[msg.sender];
 //    }
 //
-//    function getMyVoteHistory() returns(uint[] _answerOnVotes, uint[] _answerOptions){
+//    function getMyVoteHistory() public returns(uint[] _answerOnVotes, uint[] _answerOptions){
 //        uint[] answerOnVotes;
 //        uint[] answerOptions; 
 //        for (uint i = 0; i < voteId; i++) 
