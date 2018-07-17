@@ -92,13 +92,13 @@ contract('VoteFactory', function(accounts) {
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
             await voteFactory.startVote(vote_id_1, {from: creator});
             
-            await voteFactory.voteAnswer(vote_id_1, answer_optId_1, {from: creator});
-            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: owner});
-            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: user}); 
+            await voteFactory.castVote(vote_id_1, answer_optId_1, {from: creator});
+            await voteFactory.castVote(vote_id_1, answer_optId_2, {from: owner});
+            await voteFactory.castVote(vote_id_1, answer_optId_2, {from: user}); 
             
-            await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: creator}));
-            await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: owner}));
-            await expectThrow(voteFactory.voteAnswer(vote_id_1,  answer_optId_2, {from: user}));   
+            await expectThrow(voteFactory.castVote(vote_id_1,  answer_optId_2, {from: creator}));
+            await expectThrow(voteFactory.castVote(vote_id_1,  answer_optId_2, {from: owner}));
+            await expectThrow(voteFactory.castVote(vote_id_1,  answer_optId_2, {from: user}));   
         });
 
         it('user should not be able to vote in a not exist ballot', async() => {
@@ -107,7 +107,7 @@ contract('VoteFactory', function(accounts) {
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
             await voteFactory.startVote(vote_id_1, {from: creator});
 
-            await expectThrow(voteFactory.voteAnswer(vote_id_2,  answer_optId_2, {from: creator}));
+            await expectThrow(voteFactory.castVote(vote_id_2,  answer_optId_2, {from: creator}));
         });
 
 /*         it('user should not be able to select a not exist answer option', async() => {
@@ -126,9 +126,9 @@ contract('VoteFactory', function(accounts) {
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
             await voteFactory.startVote(vote_id_1, {from: creator});
-            await voteFactory.voteAnswer(vote_id_1, answer_optId_1, {from: creator});
-            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: owner});
-            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: user}); 
+            await voteFactory.castVote(vote_id_1, answer_optId_1, {from: creator});
+            await voteFactory.castVote(vote_id_1, answer_optId_2, {from: owner});
+            await voteFactory.castVote(vote_id_1, answer_optId_2, {from: user}); 
             
             var voteResult; 
             voteResult = await voteFactory.results(vote_id_1, {from: creator});
@@ -158,8 +158,8 @@ contract('VoteFactory', function(accounts) {
             await voteFactory.addAnswer(vote_id_1, answer_opt_1, {from: creator});
             await voteFactory.addAnswer(vote_id_1, answer_opt_2, {from: creator});
             await voteFactory.startVote(vote_id_1, {from: creator});
-            await voteFactory.voteAnswer(vote_id_1, answer_optId_1, {from: creator});
-            await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: owner});
+            await voteFactory.castVote(vote_id_1, answer_optId_1, {from: creator});
+            await voteFactory.castVote(vote_id_1, answer_optId_2, {from: owner});
 
             await voteFactory.EndVote(vote_id_1, {from: creator});
            // await expectThrow(voteFactory.EndVote(vote_id_1, {from: user}));

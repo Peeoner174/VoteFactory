@@ -74,7 +74,7 @@ contract VoteFactory is  Ownable   {
         emit StartVote(_voteId);
     }
 
-   function voteAnswer(
+   function castVote(
         uint256 _voteId,
         uint256 _answerOption
     )
