@@ -36,6 +36,7 @@ contract VoteFactory is  Ownable   {
 
         mapping (uint256 => uint256) voteCount;
         mapping (address => bool) voterIsVoted;
+//        mapping (address => uint) votedFor;
     }
 
     Vote[] public votes;
@@ -82,6 +83,7 @@ contract VoteFactory is  Ownable   {
         
         require(votes[_voteId].answers.length >= _answerOption);
         votes[_voteId].voterIsVoted[msg.sender] = true;
+//        votes[_voteId].votedFor[msg.sender] = _answerOption;
         votes[_voteId].voteCount[_answerOption] += 1; 
     }
     
@@ -90,15 +92,33 @@ contract VoteFactory is  Ownable   {
        emit EndVote(_voteId);
     }
 
-    function voteCount(uint256 _voteId) public view returns(uint256[]) {
+    function results(uint256 _voteId) public view returns(uint256[]) {
         uint256[] memory result = new uint256[](votes[_voteId].answers.length);
         for (uint256 i = 0; i < votes[_voteId].answers.length; i ++)
             result[i] = votes[_voteId].voteCount[i];
-    return result;
+        return result;
     }
 
     function isStarted(uint256 _voteId) public view returns(bool) {
         return votes[_voteId].state == State.Started;
     }
- 
+
+//    function casting(uint _voteId) returns(uint _answerOption) {
+//            return votes[_voteId].votedFor[msg.sender];
+//    }
+//
+//    function getMyVoteHistory() returns(uint[] _answerOnVotes, uint[] _answerOptions){
+//        uint[] answerOnVotes;
+//        uint[] answerOptions; 
+//        for (uint i = 0; i < voteId; i++) 
+//            if (votes[i].voterIsVoted[msg.sender] == true) {  
+//                answerOnVotes.push(i);
+//        }
+//        for (uint j = 0; j < answerOnVotes.length; j++) {
+//            answerOptions.push(casting(answerOnVotes[i]));
+//         } 
+//        return (answerOnVotes, answerOptions);
+//
+//    }
+    
 }

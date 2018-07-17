@@ -131,11 +131,11 @@ contract('VoteFactory', function(accounts) {
             await voteFactory.voteAnswer(vote_id_1, answer_optId_2, {from: user}); 
             
             var voteResult; 
-            voteResult = await voteFactory.voteCount(vote_id_1, {from: creator});
+            voteResult = await voteFactory.results(vote_id_1, {from: creator});
             console.log(voteResult);
-            voteResult = await voteFactory.voteCount(vote_id_1, {from: owner});
+            voteResult = await voteFactory.results(vote_id_1, {from: owner});
             console.log(voteResult);
-            voteResult = await voteFactory.voteCount(vote_id_1, {from: user});
+            voteResult = await voteFactory.results(vote_id_1, {from: user});
             console.log(voteResult);
         });
 
